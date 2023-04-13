@@ -3,20 +3,21 @@ import { Buffer } from 'buffer'
 import {
     IServerNetworkAdapter,
     User,
-    UserConnectionState,
     InstanceNetwork,
-    Context
 } from 'nengi'
 
 import { BufferReader, BufferWriter } from 'nengi-buffers'
 
+type UserData = {
+    user: User
+}
+
 class uWebSocketsInstanceAdapter implements IServerNetworkAdapter {
     network: InstanceNetwork
-    context: Context
 
+    // TODO allow uws.js config to be passed
     constructor(network: InstanceNetwork, config: any) {
         this.network = network
-        this.context = this.network.instance.context
     }
 
     // consider a promise?
@@ -27,25 +28,25 @@ class uWebSocketsInstanceAdapter implements IServerNetworkAdapter {
             //idleTimeout: 30,
             //maxBackpressure: 1024,
             //maxPayloadLength: 512,
-            open: async (ws: WebSocket) => {
-                const user = new User(ws)
-                ws.user = user
+            open: async (ws: WebSocket<UserData>) => {
+                const user = new User(ws, this)
+                ws.getUserData().user = user
                 user.remoteAddress = Buffer.from(ws.getRemoteAddressAsText()).toString('utf8')
                 this.network.onOpen(user)
             },
-            message: async (ws: WebSocket, message: any, isBinary: boolean) => {
-                const user = ws.user as User
+            message: async (ws: WebSocket<UserData>, message: any, isBinary: boolean) => {
+                const user = ws.getUserData().user
                 if (isBinary) {
-                    const binaryReader = new BufferReader(Buffer.from(message), 0)
-                    this.network.onMessage(user, binaryReader, BufferWriter)
+                    //const binaryReader = new BufferReader(Buffer.from(message), 0)
+                    this.network.onMessage(user, Buffer.from(message))
                 }
             },
-            drain: (ws: WebSocket) => {
+            drain: (ws: WebSocket<UserData>) => {
                 console.log('WebSocket backpressure: ' + ws.getBufferedAmount())
             },
-            close: (ws: WebSocket, code: number, message: ArrayBuffer) => {
+            close: (ws: WebSocket<UserData>, code: number, message: ArrayBuffer) => {
                 console.log('WebSocket closed', code, message)
-                this.network.onClose(ws.user)
+                this.network.onClose(ws.getUserData().user)
             }
 
         }).listen(port, (listenSocket: any) => {
@@ -53,6 +54,18 @@ class uWebSocketsInstanceAdapter implements IServerNetworkAdapter {
                 ready()
             }
         })
+    }
+
+    createBuffer(lengthInBytes: number) {
+        return Buffer.allocUnsafe(lengthInBytes)
+    }
+
+    createBufferWriter(lengthInBytes: number) {
+        return new BufferWriter(this.createBuffer(lengthInBytes))
+    }
+
+    createBufferReader(buffer: Buffer) {
+        return new BufferReader(buffer)
     }
 
     disconnect(user: User, reason: any): void {

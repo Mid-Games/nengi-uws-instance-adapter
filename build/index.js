@@ -15,9 +15,9 @@ const buffer_1 = require("buffer");
 const nengi_1 = require("nengi");
 const nengi_buffers_1 = require("nengi-buffers");
 class uWebSocketsInstanceAdapter {
+    // TODO allow uws.js config to be passed
     constructor(network, config) {
         this.network = network;
-        this.context = this.network.instance.context;
     }
     // consider a promise?
     listen(port, ready) {
@@ -26,16 +26,16 @@ class uWebSocketsInstanceAdapter {
             //maxBackpressure: 1024,
             //maxPayloadLength: 512,
             open: (ws) => __awaiter(this, void 0, void 0, function* () {
-                const user = new nengi_1.User(ws);
-                ws.user = user;
+                const user = new nengi_1.User(ws, this);
+                ws.getUserData().user = user;
                 user.remoteAddress = buffer_1.Buffer.from(ws.getRemoteAddressAsText()).toString('utf8');
                 this.network.onOpen(user);
             }),
             message: (ws, message, isBinary) => __awaiter(this, void 0, void 0, function* () {
-                const user = ws.user;
+                const user = ws.getUserData().user;
                 if (isBinary) {
-                    const binaryReader = new nengi_buffers_1.BufferReader(buffer_1.Buffer.from(message), 0);
-                    this.network.onMessage(user, binaryReader, nengi_buffers_1.BufferWriter);
+                    //const binaryReader = new BufferReader(Buffer.from(message), 0)
+                    this.network.onMessage(user, buffer_1.Buffer.from(message));
                 }
             }),
             drain: (ws) => {
@@ -43,13 +43,22 @@ class uWebSocketsInstanceAdapter {
             },
             close: (ws, code, message) => {
                 console.log('WebSocket closed', code, message);
-                this.network.onClose(ws.user);
+                this.network.onClose(ws.getUserData().user);
             }
         }).listen(port, (listenSocket) => {
             if (listenSocket) {
                 ready();
             }
         });
+    }
+    createBuffer(lengthInBytes) {
+        return buffer_1.Buffer.allocUnsafe(lengthInBytes);
+    }
+    createBufferWriter(lengthInBytes) {
+        return new nengi_buffers_1.BufferWriter(this.createBuffer(lengthInBytes));
+    }
+    createBufferReader(buffer) {
+        return new nengi_buffers_1.BufferReader(buffer);
     }
     disconnect(user, reason) {
         user.socket.end(1000, JSON.stringify(reason));

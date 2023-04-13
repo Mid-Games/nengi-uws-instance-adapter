@@ -1,11 +1,14 @@
 /// <reference types="node" />
 import { Buffer } from 'buffer';
-import { IServerNetworkAdapter, User, InstanceNetwork, Context } from 'nengi';
+import { IServerNetworkAdapter, User, InstanceNetwork } from 'nengi';
+import { BufferReader, BufferWriter } from 'nengi-buffers';
 declare class uWebSocketsInstanceAdapter implements IServerNetworkAdapter {
     network: InstanceNetwork;
-    context: Context;
     constructor(network: InstanceNetwork, config: any);
     listen(port: number, ready: () => void): void;
+    createBuffer(lengthInBytes: number): Buffer;
+    createBufferWriter(lengthInBytes: number): BufferWriter;
+    createBufferReader(buffer: Buffer): BufferReader;
     disconnect(user: User, reason: any): void;
     send(user: User, buffer: Buffer): void;
 }

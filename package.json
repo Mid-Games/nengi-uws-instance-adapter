@@ -1,6 +1,6 @@
 {
   "name": "nengi-uws-instance-adapter",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "uWebSockets.js adapter for nengi instance",
   "main": "./build/index.js",
   "scripts": {
@@ -18,8 +18,8 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "nengi": "github:timetocode/nengi#nengi2-experimental",
+    "nengi": "^2.0.0-alpha.8",
     "nengi-buffers": "^0.3.0",
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.19.0"
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.20.0"
   }
 }
