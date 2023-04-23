@@ -37,7 +37,6 @@ class uWebSocketsInstanceAdapter implements IServerNetworkAdapter {
             message: async (ws: WebSocket<UserData>, message: any, isBinary: boolean) => {
                 const user = ws.getUserData().user
                 if (isBinary) {
-                    //const binaryReader = new BufferReader(Buffer.from(message), 0)
                     this.network.onMessage(user, Buffer.from(message))
                 }
             },
@@ -45,7 +44,6 @@ class uWebSocketsInstanceAdapter implements IServerNetworkAdapter {
                 console.log('WebSocket backpressure: ' + ws.getBufferedAmount())
             },
             close: (ws: WebSocket<UserData>, code: number, message: ArrayBuffer) => {
-                console.log('WebSocket closed', code, message)
                 this.network.onClose(ws.getUserData().user)
             }
 

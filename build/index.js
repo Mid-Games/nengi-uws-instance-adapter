@@ -34,7 +34,6 @@ class uWebSocketsInstanceAdapter {
             message: (ws, message, isBinary) => __awaiter(this, void 0, void 0, function* () {
                 const user = ws.getUserData().user;
                 if (isBinary) {
-                    //const binaryReader = new BufferReader(Buffer.from(message), 0)
                     this.network.onMessage(user, buffer_1.Buffer.from(message));
                 }
             }),
@@ -42,7 +41,6 @@ class uWebSocketsInstanceAdapter {
                 console.log('WebSocket backpressure: ' + ws.getBufferedAmount());
             },
             close: (ws, code, message) => {
-                console.log('WebSocket closed', code, message);
                 this.network.onClose(ws.getUserData().user);
             }
         }).listen(port, (listenSocket) => {
