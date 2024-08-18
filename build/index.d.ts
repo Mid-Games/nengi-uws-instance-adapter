@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { Buffer } from 'buffer';
 import { IServerNetworkAdapter, User, InstanceNetwork } from 'nengi';
 import { BufferReader, BufferWriter } from 'nengi-buffers';
