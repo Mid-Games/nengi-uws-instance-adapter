@@ -18,7 +18,8 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "nengi": "^2.0.0-alpha.8",
+    "@types/node": "^20.11.16",
+    "nengi": "^2.0.0-alpha.170",
     "nengi-buffers": "^0.3.0",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.47.0"
   }
