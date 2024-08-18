@@ -1,6 +1,6 @@
 {
   "name": "nengi-uws-instance-adapter",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "uWebSockets.js adapter for nengi instance",
   "main": "./build/index.js",
   "scripts": {
